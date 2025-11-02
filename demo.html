@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Book Carousel Library</title>
+<style>
+  body { font-family:"Poppins",sans-serif; background:#f9fafb; margin:0; padding:0; }
+  header{ background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:20px 40px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+  .logo{ font-size:26px; font-weight:700; color:#007bff; }
+  .search-bar{ display:flex; align-items:center; background:#fff; border-radius:30px; padding:6px 15px; width:420px; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; }
+  .search-bar input{ border:none; outline:none; width:100%; font-size:15px; font-weight:500; color:#333; }
+  .search-bar button{ border:none; background:#007bff; color:#fff; border-radius:20px; padding:6px 14px; cursor:pointer; transition:background .3s; }
+  .search-bar button:hover{ background:#0056b3; }
+  .clear-btn{ background:none; border:none; color:#999; font-size:18px; margin-left:6px; cursor:pointer; display:none; }
+  .clear-btn:hover{ color:#ff4444; }
+
+  .mega-btn{ position:relative; }
+  .mega-btn button{ background:#ffd166; border:none; padding:10px 18px; border-radius:8px; font-weight:600; cursor:pointer; }
+  .mega-menu{ display:none; position:absolute; top:48px; right:0; background:#fff; padding:20px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.12); width:220px; }
+  .mega-menu.active{ display:block; }
+  .mega-menu a{ display:block; text-decoration:none; color:#333; padding:10px 0; font-weight:500; }
+  .mega-menu a:hover{ color:#007bff; }
+
+  .book-section{ position:relative; margin:40px 20px; text-align:center; transition:opacity .18s; }
+  .section-title{ font-size:26px; margin-bottom:18px; text-align:left; padding-left:10px; color:#333; }
+  .book-carousel{ display:flex; overflow-x:auto; overflow-y:visible; scroll-behavior:smooth; justify-content:flex-start; gap:18px; padding:8px 6px; flex-wrap:nowrap; align-items:stretch; }
+  .book-carousel::-webkit-scrollbar{ height:8px; }
+  .book-carousel::-webkit-scrollbar-thumb{ background:#e0e0e0; border-radius:8px; }
+
+  .book-card{ background:#fff; width:300px; min-width:300px; height:400px; border-radius:14px; box-shadow:0 6px 16px rgba(0,0,0,.1); display:flex; flex-direction:column; align-items:center; text-align:center; padding:14px; flex-shrink:0; transition:transform .25s; }
+  .book-card:hover{ transform:translateY(-6px) scale(1.03); }
+  .book-card img{ width:100%; height:260px; object-fit:contain; border-radius:10px; margin-bottom:10px; }
+  .btn-group{ margin-top:auto; display:flex; gap:14px; margin-bottom:15px; }
+  .read,.download{ padding:10px 14px; border-radius:8px; border:none; font-weight:600; cursor:pointer; font-size:14px; text-decoration:none; display:inline-block; }
+  .read{ background:#007bff; color:#fff; } .download{ background:#ffd166; color:#111; }
+  .read:hover{ background:#0056b3 } .download:hover{ background:#ffca2c }
+
+  .nav-btn { position:absolute; top:50%; transform:translateY(-50%); background:#007bff; color:#fff; border:none; width:42px; height:42px; border-radius:50%; font-size:20px; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.12); z-index:10; display:flex; align-items:center; justify-content:center; }
+  .nav-btn:hover{ background:#0056b3; transform:scale(1.05); }
+  .nav-prev{ left:8px; }
+  .nav-next{ right:8px; }
+
+  .no-results { display:none; text-align:center; color:#777; margin-top:10px; font-weight:600; }
+
+  @media (max-width:991px){ .search-bar{ width:300px } .book-card{ width:260px; min-width:260px; height:370px } .book-card img{ height:230px } }
+  @media (max-width:767px){ header{ flex-direction:column; gap:15px } .search-bar{ width:90% } .mega-btn{ align-self:flex-end } .book-card{ width:220px; min-width:220px; height:330px } .book-card img{ height:200px } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📚E-Book</div>
+  <div class="search-bar">
+    <input id="searchInput" type="text" placeholder="Search books..." />
+    <button id="searchBtn">Search</button>
+    <button class="clear-btn" id="clearBtn">✖</button>
+  </div>
+  <div class="mega-btn">
+    <button id="menuToggle">🎭 Genre</button>
+    <div class="mega-menu" id="megaMenu">
+      <a href="#" onclick="showGenre('all');return false;">All</a>
+      <a href="#" onclick="showGenre('fantasy');return false;">Fantasy</a>
+      <a href="#" onclick="showGenre('adventure');return false;">Adventure</a>
+      <a href="#" onclick="showGenre('horror');return false;">Horror</a>
+    </div>
+  </div>
+</header>
+
+<div style="max-width:1200px;margin:14px auto;padding:0 12px;">
+  <div class="no-results" id="noResults">No books found.</div>
+</div>
+
+<!-- ===== Fantasy Section ===== -->
+<section class="book-section" id="fantasy" data-genre="fantasy">
+  <h2 class="section-title">Fantasy Books</h2>
+  <button class="nav-btn nav-prev">&lt;</button>
+  <div class="book-carousel">
+    <div class="book-card"><img src="thumbnail_pics/pino22.png"><h3>Adventures of Pinocchio</h3><div class="btn-group"><a class="read" href="pdfs/Adventures-of-Pinocchio.pdf">Read Here</a><a class="download" href="pdfs/Adventures-of-Pinocchio.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/beauty.png"><h3>Beauty and the Beast</h3><div class="btn-group"><a class="read" href="pdfs/Beauty-and-the-Beast.pdf">Read Here</a><a class="download" href="pdfs/Beauty-and-the-Beast.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/Travel.png"><h3>Gulliver's Travel</h3><div class="btn-group"><a class="read" href="pdfs/Gulliver's-Travels.pdf">Read Here</a><a class="download" href="pdfs/Gulliver's-Travels.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/Helga.png"><h3>Helga-Out-of-Hedgelands</h3><div class="btn-group"><a class="read" href="pdfs/Helga-Out-of-Hedgelands.pdf">Read Here</a><a class="download" href="pdfs/Helga-Out-of-Hedgelands.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/Clarimonde.png"><h3>Clarimonde</h3><div class="btn-group"><a class="read" href="pdfs/Clarimonde.pdf">Read Here</a><a class="download" href="pdfs/Clarimonde.pdf" download>Download</a></div></div>
+
+  </div>
+  <button class="nav-btn nav-next">&gt;</button>
+</section>
+
+<!-- ===== Adventure Section ===== -->
+<section class="book-section" id="adventure" data-genre="adventure">
+  <h2 class="section-title">Adventure Books</h2>
+  <button class="nav-btn nav-prev">&lt;</button>
+  <div class="book-carousel">
+    <div class="book-card"><img src="thumbnail_pics/Aladin.png"><h3>Aladdin and the Magic</h3><div class="btn-group"><a class="read" href="pdfs/Aladdin-and-the-Magic-Lamp.pdf">Read Here</a><a class="download" href="pdfs/Aladdin-and-the-Magic-Lamp.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/time.png"><h3>The Time Machine</h3><div class="btn-group"><a class="read" href="pdfs/The-Time-Machine.pdf">Read Here</a><a class="download" href="pdfs/The-Time-Machine.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/Arabian night.png"><h3>The Arabian Nights</h3><div class="btn-group"><a class="read" href="pdfs/The-Arabian-Nights.pdf">Read Here</a><a class="download" href="pdfs/The-Arabian-Nights.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/whisper.png"><h3>Whispers_of_Wonder</h3><div class="btn-group"><a class="read" href="pdfs/Whispers_of_Wonder_Fantasy_Stories.pdf">Read Here</a><a class="download" href="pdfs/Whispers_of_Wonder_Fantasy_Stories.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/Exercise.png"><h3>Exercise is murder</h3><div class="btn-group"><a class="read" href="pdfs/Exercise-Is-Murder.pdf">Read Here</a><a class="download" href="pdfs/Exercise-Is-Murder.pdf" download>Download</a></div></div>
+  </div>
+  <button class="nav-btn nav-next">&gt;</button>
+</section>
+
+<!-- ===== Horror Section ===== -->
+<section class="book-section" id="horror" data-genre="horror">
+  <h2 class="section-title">Horror Books</h2>
+  <button class="nav-btn nav-prev">&lt;</button>
+  <div class="book-carousel">
+    <div class="book-card"><img src="thumbnail_pics/canterville.png"><h3>The Canterville Ghost</h3><div class="btn-group"><a class="read" href="pdfs/The-Canterville-Ghost.pdf">Read Here</a><a class="download" href="pdfs/The-Canterville-Ghost.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/phantome.png"><h3>The Phantom of the Opera</h3><div class="btn-group"><a class="read" href="pdfs/The-Canterville-Ghost.pdf">Read Here</a><a class="download" href="pdfs/The-Canterville-Ghost.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/dracula.png"><h3>Dracula</h3><div class="btn-group"><a class="read" href="pdfs/d">Read Here</a><a class="download" href="pdfs/Dracula.pdf"download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/ghoststory.png"><h3>The ghost story</h3><div class="btn-group"><a class="read" href="pdfs/The-Best-Ghost-Stories.pdf">Read Here</a><a class="download" href="pdfs/The-Best-Ghost-Stories.pdf" download>Download</a></div></div>
+    <div class="book-card"><img src="thumbnail_pics/invisible.png"><h3>The invisible man</h3><div class="btn-group"><a class="read" href="pdfs/The-Invisible-Man.pdf">Read Here</a><a class="download" href="pdfs/The-Invisible-Man.pdf" download>Download</a></div></div>
+  </div>
+  <button class="nav-btn nav-next">&gt;</button>
+</section>
+
+<script>
+const searchInput=document.getElementById("searchInput");
+const clearBtn=document.getElementById("clearBtn");
+const noResults=document.getElementById("noResults");
+const searchBtn=document.getElementById("searchBtn");
+
+function normalize(s){return(s||"").toString().trim().toLowerCase();}
+function getGapPx(carousel){const gap=getComputedStyle(carousel).gap;return gap?parseInt(gap):18;}
+function computeScrollStep(carousel){const gap=getGapPx(carousel);const card=Array.from(carousel.querySelectorAll(".book-card")).find(c=>c.style.display!=="none");return card?card.offsetWidth+gap:300+gap;}
+function runFilter(query){const q=normalize(query);const sections=Array.from(document.querySelectorAll(".book-section"));let total=0;sections.forEach(s=>{const cards=Array.from(s.querySelectorAll(".book-card"));let match=0;cards.forEach(c=>{const title=normalize(c.querySelector("h3")?.textContent);const isMatch=q===""?true:title.includes(q);c.style.display=isMatch?"flex":"none";if(isMatch)match++;});s.style.display=match>0?"block":"none";total+=match;const carousel=s.querySelector(".book-carousel");if(carousel)carousel.scrollLeft=0;});clearBtn.style.display=q?"block":"none";noResults.style.display=total===0?"block":"none";recalcAllScrollSteps();}
+let debounceTimer;
+function liveSearchDebounced(){clearTimeout(debounceTimer);debounceTimer=setTimeout(()=>runFilter(searchInput.value),80);}
+function clearSearch(){searchInput.value="";runFilter("");clearBtn.style.display="none";noResults.style.display="none";document.querySelectorAll(".book-section").forEach(s=>s.style.display="block");}
+function showGenre(genre){clearSearch();if(genre==="all"){document.querySelectorAll(".book-section").forEach(s=>s.style.display="block");}else{document.querySelectorAll(".book-section").forEach(s=>{s.style.display=(s.dataset.genre===genre)?"block":"none";});}recalcAllScrollSteps();document.getElementById("megaMenu").classList.remove("active");}
+const carouselData=new WeakMap();
+function recalcAllScrollSteps(){document.querySelectorAll(".book-section").forEach(s=>{const c=s.querySelector(".book-carousel");if(!c)return;carouselData.set(c,{step:computeScrollStep(c)});const max=Math.max(0,c.scrollWidth-c.clientWidth);if(c.scrollLeft>max)c.scrollLeft=max;});}
+document.querySelectorAll(".book-section").forEach(s=>{const c=s.querySelector(".book-carousel");const p=s.querySelector(".nav-prev");const n=s.querySelector(".nav-next");if(!c)return;carouselData.set(c,{step:computeScrollStep(c)});function getMax(){return Math.max(0,c.scrollWidth-c.clientWidth);}
+function next(){const step=(carouselData.get(c)||{}).step||computeScrollStep(c);if(c.scrollLeft+c.clientWidth>=c.scrollWidth-6){c.scrollLeft=0;}else{c.scrollLeft=Math.min(getMax(),c.scrollLeft+step);}}
+function prev(){const step=(carouselData.get(c)||{}).step||computeScrollStep(c);if(c.scrollLeft<=6){c.scrollLeft=getMax();}else{c.scrollLeft=Math.max(0,c.scrollLeft-step);}}
+n?.addEventListener("click",next);p?.addEventListener("click",prev);});
+window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>recalcAllScrollSteps(),120);});
+searchInput.addEventListener("input",liveSearchDebounced);
+searchBtn.addEventListener("click",()=>runFilter(searchInput.value));
+clearBtn.addEventListener("click",clearSearch);
+const menuToggle=document.getElementById("menuToggle");
+const megaMenu=document.getElementById("megaMenu");
+menuToggle.addEventListener("click",()=>megaMenu.classList.toggle("active"));
+document.addEventListener("click",e=>{if(!e.target.closest(".mega-btn"))megaMenu.classList.remove("active");});
+runFilter("");
+
+document.querySelectorAll('.download').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const fileURL = link.getAttribute('href');
+    const fileName = fileURL.split('/').pop();
+    const a = document.createElement('a');
+    a.href = fileURL;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+});
+</script>
+</body>
+</html>
